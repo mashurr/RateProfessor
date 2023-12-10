@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block prof %}
+
+<div>
+<h2>Professor: {{ professor.firstname }} {{ professor.lastname }}</h2>
+<h2>Department: {{ professor.department }}</h2>
+<h2># Courses: {{ stats.numcourses }}  Avg_rating: {{ stats.avgrating }} # Rating: {{ stats.numratings }}</h2>
+</div>
+
+<div>
+    <h2> Add Rating for {{ professor.firstname }} {{ professor.lastname }}: </h2>
+    <form action={{ url_for('add_rating') }} method="post">
+        <input type="text" name="review" placeholder="Review" required>
+        <input type="hidden" name="professor_id" value={{ professor.id }} required>
+        <select name="rating">
+            <Option value="">Rating</Option>
+            {% for i in range(1, 6) %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        <input type="text" name="course" placeholder="Course..." 
+        hx-post={{ url_for('search_course') }} hx_trigger="input changed delay:30ms" hx-target="#results">
+        <select id="results" name="course_number" required>
+            <option value="" default>Search</option>
+        </select>
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+{% if ratings %}
+<div>
+    <h2>{{ professor.firstname }} {{ professor.lastname }} Rating List: </h2>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Review</th>
+      <th>Rating</th>
+      <th>Course</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for r in ratings %}
+    <tr>
+        <td>{{ r.review }}</td>
+        <td>{{ r.rating }}</td>
+        <td>{{ r.course_number }}</td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+{% endblock %}

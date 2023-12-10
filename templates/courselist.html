@@ -1,0 +1,5 @@
+{% if courses %}
+{% for course in courses %}
+<option value="{{ course.id }}">{{ course.course_number }}</option>
+{% endfor %}
+{% endif %}

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block prof %}
+<h2>Add Professor: </h2>
+  <div>
+    <form action={{ url_for('add_professor') }} method="post">
+    <input type="text" name="firstname" placeholder="FirstName" required>
+    <input type="text" name="lastname" placeholder="LastName" required>
+    <select name="department" placeholder="Department" required>
+      <option value="" default>Select Department</option>
+      {% for d in departments %}
+      <option value="{{ d.department }}">{{ d.department_code }}: {{ d.department }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Add</button>
+    </form>
+  </div>
+
+{% if professors %}
+<h2>list of professors: </h2>
+<table>
+  <thead>
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Department</th>
+      <th>         </th>
+    </tr>
+  </thead>
+  <tbody>
+{% for p in professors %}
+    <tr>
+        <td>{{ p.firstname }}</td>
+        <td>{{ p.lastname }}</td>
+        <td>{{ p.department }}</td>
+        <td><a href={{ url_for('info_prof',id=p.id) }}>rate</a></td>
+    </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
+{% endblock %}
