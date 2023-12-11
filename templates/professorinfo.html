@@ -38,6 +38,8 @@
       <th>Review</th>
       <th>Rating</th>
       <th>Course</th>
+      <th>      </th>
+      <th>      </th>
     </tr>
   </thead>
   <tbody>
@@ -46,6 +48,8 @@
         <td>{{ r.review }}</td>
         <td>{{ r.rating }}</td>
         <td>{{ r.course_number }}</td>
+        <td><a href={{ url_for('delete_rating',id=r.id) }}>delete</a></td>
+        <td><a href={{ url_for('update_rating',id=r.id) }}>update</a></td>
     </tr>
 {% endfor %}
 </tbody>

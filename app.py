@@ -23,7 +23,7 @@ class Department(db.Model):
     department_code = db.Column(db.String)
 
 class Rating(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, index=True)
     professor_id = db.Column(db.Integer)
     course_id = db.Column(db.Integer, index=True)
     rating = db.Column(db.Integer)
@@ -56,13 +56,21 @@ def add_professor():
         db.session.commit()
         request.method = 'GET'
         return redirect(url_for('get_professors'))
+    
+@app.route('/deleteProfessor/<id>', methods=['GET'])
+def delete_professor(id):
+    professor = Professor.query.filter_by(id=id).first()
+    db.session.delete(professor)
+    db.session.commit()
+    request.method = 'GET'
+    return redirect(url_for('get_professors'))
 
 @app.route('/infoProf/<id>', methods=['GET'])
 def info_prof(id):
     prof = Professor.query.filter_by(id=id).first()
     rats = db.session.execute(
         text('''
-            SELECT review, rating, course_number FROM rating 
+            SELECT rating.id, review, rating, course_number FROM rating 
             INNER JOIN course ON rating.course_id = course.id
             WHERE professor_id = :prof_id;
             '''
@@ -94,6 +102,37 @@ def add_rating():
         db.session.commit()
         request.method = 'GET'
         return redirect(f"infoProf/{professor_id}")
+
+@app.route('/deleteRating/<id>', methods=['GET'])
+def delete_rating(id):
+    rating = Rating.query.filter_by(id=id).first()
+    professor_id = rating.professor_id  # Save professor_id before deletion for redirect
+    db.session.delete(rating)
+    db.session.commit()
+    request.method = 'GET'
+    return redirect(url_for('info_prof', id=professor_id))
+
+@app.route('/updateRating/<id>', methods=['GET', 'POST'])
+def update_rating(id):
+    rating = Rating.query.filter_by(id=id).first()
+    
+    if request.method == 'POST':
+        new_review = request.form.get("review")
+        new_rating = request.form.get("rating")
+        new_course_id = request.form.get("course_number")
+        new_professor_id = request.form.get("professor_id")
+        
+        rating.review = new_review
+        rating.rating = new_rating
+        rating.course_id = new_course_id
+        rating.professor_id = new_professor_id
+
+        db.session.commit()
+
+        request.method = 'GET'
+        return redirect(url_for('info_prof', id=rating.professor_id))
+    else:
+        return render_template('updateRating.html', rating=rating)
 
 def avg_prof_rating(prof_id):
     rating = db.session.execute(
